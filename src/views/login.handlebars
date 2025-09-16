@@ -1,0 +1,15 @@
+<div class="container">
+  <h2>Iniciar sesión</h2>
+
+  {{#if error}}
+    <div class="alert">¡Login fallido! Revisa tus credenciales</div>
+  {{/if}}
+
+  <form method="POST" action="/users/login">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+    <button type="submit" class="btn">Ingresar</button>
+  </form>
+
+  <p>¿No tenés cuenta? <a href="/users/register">Registrate aquí</a></p>
+</div>

@@ -1,0 +1,28 @@
+{{#if welcomeMessage}}
+  <div class="welcome-message" style="background-color: #27ae60; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+    {{welcomeMessage}}
+  </div>
+{{/if}}
+
+<h1>Lista de Productos</h1>
+
+<div class="dashboard">
+  {{#each products}}
+    <div class="product-card" data-id="{{this._id}}">
+      <div class="product-image-container">
+        <img 
+          class="product-image" 
+          src="{{#if this.thumbnail}}{{this.thumbnail}}{{else}}/img/default-placeholder.png{{/if}}"
+          alt="{{this.title}}"
+        >
+      </div>
+      <h2 class="product-title">{{this.title}}</h2>
+      <h3 class="product-price">Precio: ${{this.price}}</h3>
+      <p class="product-description">{{this.description}}</p>
+      <p class="product-category">Categoría: {{this.category}}</p>
+      <a class="details-btn btn" href="/products/{{this._id}}">Ver detalles</a>
+      <button class="delete-btn btn" data-id="{{this._id}}">Eliminar</button>
+      <button class="add-to-cart-btn btn" data-id="{{this._id}}">Agregar al carrito</button>
+    </div>
+  {{/each}}
+</div>
