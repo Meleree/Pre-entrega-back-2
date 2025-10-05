@@ -1,10 +1,17 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 
-export function generateToken(user) {
-  const payload = { user }; 
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
-}
-
-export function verifyToken(token) {
+export const verifyToken = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET);
-}
+};
+
+// Nueva función que necesitas
+export const signToken = (user) => {
+  const payload = {
+    id: user._id,
+    email: user.email,
+    role: user.role
+  };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+};

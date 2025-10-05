@@ -1,58 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{title}}</title>
+  <title>{{product.title}}</title>
+  <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-  <h1>{{product.title}}</h1>
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="/" class="btn-header">Inicio</a></li>
+      <li><a href="/products" class="btn-header">← Volver a productos</a></li>
+      <li><a href="/carts" class="cart-btn">🛒 Carrito</a></li>
+    </ul>
+  </nav>
 
-  <img 
-    src="{{#if product.thumbnail}}{{product.thumbnail}}{{else}}/img/default-placeholder.png{{/if}}" 
-    alt="Imagen de {{product.title}}" 
-    style="max-width: 100%; border-radius: 8px;"
-  >
+  <main class="dashboard">
+    <div class="product-card">
+      <div class="product-image-container">
+        <img 
+          src="{{#if product.thumbnail}}{{product.thumbnail}}{{else}}/img/default-placeholder.png{{/if}}" 
+          alt="{{product.title}}" 
+          class="product-image"
+        >
+      </div>
+      <h2 class="product-title">{{product.title}}</h2>
+      <p>{{product.description}}</p>
+      <p><strong>Categoría:</strong> {{product.category}}</p>
+      <p class="product-price">$ {{product.price}}</p>
 
-  <p><strong>Descripción:</strong> {{product.description}}</p>
-  <p><strong>Categoría:</strong> {{product.category}}</p>
-  <p><strong>Precio:</strong> ${{product.price}}</p>
-
-  <button id="add-to-cart-btn" data-id="{{product._id}}">Agregar al carrito</button>
+      <button id="add-to-cart-btn" data-id="{{product._id}}" class="btn">
+        Agregar al carrito 🛒
+      </button>
+    </div>
+  </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", () => {
       const addToCartButton = document.getElementById("add-to-cart-btn");
       if (!addToCartButton) return;
 
-      addToCartButton.addEventListener("click", async function() {
-        const productId = addToCartButton.getAttribute("data-id");
+      addToCartButton.addEventListener("click", async () => {
+        const productId = addToCartButton.dataset.id;
 
         try {
           let cartId = localStorage.getItem("cartId");
+
           if (!cartId) {
             const response = await fetch("/api/carts", { method: "POST" });
-            if (!response.ok) throw new Error("No se pudo crear el carrito.");
             const data = await response.json();
+            if (!response.ok || !data.payload?._id) throw new Error("No se pudo crear el carrito.");
             cartId = data.payload._id;
             localStorage.setItem("cartId", cartId);
           }
 
-          const response = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+          const addResponse = await fetch(`/api/carts/${cartId}/product/${productId}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ quantity: 1 }),
           });
 
-          if (response.ok) {
-            alert("Producto agregado al carrito con éxito.");
+          if (addResponse.ok) {
+            alert("✅ Producto agregado al carrito con éxito.");
           } else {
-            const errorText = await response.text();
-            console.error("Error en la respuesta del servidor:", errorText);
-            alert("Error: No se pudo agregar el producto al carrito.");
+            throw new Error("No se pudo agregar el producto.");
           }
-        } catch (error) {
-          console.error("Error al agregar el producto al carrito:", error);
+        } catch (err) {
+          console.error(err);
           alert("Hubo un problema al agregar el producto al carrito.");
         }
       });

@@ -1,28 +1,85 @@
-{{#if welcomeMessage}}
-  <div class="welcome-message" style="background-color: #27ae60; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
-    {{welcomeMessage}}
-  </div>
-{{/if}}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="/" class="btn-header">Inicio</a></li>
+      <li><a href="/carts" class="cart-btn">🛒 Carrito</a></li>
+    </ul>
+  </nav>
 
-<h1>Lista de Productos</h1>
-
-<div class="dashboard">
-  {{#each products}}
-    <div class="product-card" data-id="{{this._id}}">
-      <div class="product-image-container">
-        <img 
-          class="product-image" 
-          src="{{#if this.thumbnail}}{{this.thumbnail}}{{else}}/img/default-placeholder.png{{/if}}"
-          alt="{{this.title}}"
-        >
-      </div>
-      <h2 class="product-title">{{this.title}}</h2>
-      <h3 class="product-price">Precio: ${{this.price}}</h3>
-      <p class="product-description">{{this.description}}</p>
-      <p class="product-category">Categoría: {{this.category}}</p>
-      <a class="details-btn btn" href="/products/{{this._id}}">Ver detalles</a>
-      <button class="delete-btn btn" data-id="{{this._id}}">Eliminar</button>
-      <button class="add-to-cart-btn btn" data-id="{{this._id}}">Agregar al carrito</button>
+  <!-- Mensaje de bienvenida -->
+  {{#if welcomeMessage}}
+    <div class="welcome-message" style="background-color: #27ae60; color: white; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 20px;">
+      {{welcomeMessage}}
     </div>
-  {{/each}}
-</div>
+  {{/if}}
+
+  <h1>Lista de Productos</h1>
+
+  <div class="dashboard">
+    {{#each products}}
+      <div class="product-card" data-id="{{this._id}}">
+        <div class="product-image-container">
+          <img 
+            class="product-image" 
+            src="{{#if this.thumbnail}}{{this.thumbnail}}{{else}}/img/default-placeholder.png{{/if}}"
+            alt="{{this.title}}"
+          >
+        </div>
+        <h2 class="product-title">{{this.title}}</h2>
+        <h3 class="product-price">Precio: ${{this.price}}</h3>
+        <p class="product-description">{{this.description}}</p>
+        <p class="product-category">Categoría: {{this.category}}</p>
+        <a class="details-btn btn" href="/products/{{this._id}}">Ver detalles</a>
+        <button class="add-to-cart-btn btn" data-id="{{this._id}}">Agregar al carrito</button>
+      </div>
+    {{/each}}
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+
+      addToCartButtons.forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const productId = btn.dataset.id;
+
+          try {
+            let cartId = localStorage.getItem("cartId");
+
+            if (!cartId) {
+              const response = await fetch("/api/carts", { method: "POST" });
+              const data = await response.json();
+              if (!response.ok || !data.payload?._id) throw new Error("No se pudo crear el carrito.");
+              cartId = data.payload._id;
+              localStorage.setItem("cartId", cartId);
+            }
+
+            const addResponse = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ quantity: 1 }),
+            });
+
+            if (addResponse.ok) {
+              alert("✅ Producto agregado al carrito con éxito.");
+            } else {
+              throw new Error("No se pudo agregar el producto.");
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Hubo un problema al agregar el producto al carrito.");
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

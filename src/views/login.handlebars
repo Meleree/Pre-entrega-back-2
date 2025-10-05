@@ -1,8 +1,16 @@
 <div class="container">
   <h2>Iniciar sesión</h2>
 
+  {{#if welcomeMessage}}
+    <div class="alert alert-success" style="background-color:#27ae60; color:white; padding:10px; border-radius:8px; text-align:center; margin-bottom:15px;">
+      {{welcomeMessage}}
+    </div>
+  {{/if}}
+
   {{#if error}}
-    <div class="alert">¡Login fallido! Revisa tus credenciales</div>
+    <div class="alert alert-error" style="background-color:#e74c3c; color:white; padding:10px; border-radius:8px; margin-bottom:15px;">
+      {{error}}
+    </div>
   {{/if}}
 
   <form method="POST" action="/users/login">
@@ -11,5 +19,5 @@
     <button type="submit" class="btn">Ingresar</button>
   </form>
 
-  <p>¿No tenés cuenta? <a href="/users/register">Registrate aquí</a></p>
+  <p>¿No tenés cuenta? <a href="/users/register">Registrarse</a></p>
 </div>

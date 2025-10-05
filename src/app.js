@@ -7,6 +7,7 @@ import { Server as SocketServer } from 'socket.io';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import './config/passport.js';
+import passwordRouter from './routes/password.router.js';
 
 import sessionsRouter from './routes/sessions.router.js';
 import usersViewsRouter from './routes/views.router.js';
@@ -43,6 +44,7 @@ app.use('/users', sessionsRouter);
 app.use('/api/products', productsRouter);   
 app.use('/api/carts', cartsRouter);         
 app.use('/', usersViewsRouter);             
+app.use('/password', passwordRouter); 
 
 // HTTP + Socket.io
 const server = http.createServer(app);

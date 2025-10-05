@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { verifyToken } from '../utils/jwt.js';
-import Product from '../models/product.model.js';
-import Cart from '../models/cart.model.js';
+import Product from '../dao/models/product.model.js';
+import Cart from '../dao/models/cart.model.js';
 
 const router = Router();
 
@@ -74,6 +74,13 @@ router.get('/carts/:cid', async (req, res) => {
   res.render('cart', { cart, title: `Carrito ${cart._id}`, user });
 });
 
+// ✅ Nueva ruta para listar productos
+router.get('/products', async (req, res) => {
+  const user = getUserFromCookie(req);
+  const products = await Product.find().lean();
+  res.render('products', { title: 'Productos', user, products });
+});
+
 router.get('/products/:pid', async (req, res) => {
   const user = getUserFromCookie(req);
   console.log('Ruta /products/:pid llamada con id:', req.params.pid);
@@ -94,7 +101,6 @@ router.get('/products/:pid', async (req, res) => {
     res.status(500).render('error', { message: 'Error al cargar el producto', title: 'Error', user });
   }
 });
-
 
 router.get('/realtimeproducts', async (req, res) => {
   const user = getUserFromCookie(req);

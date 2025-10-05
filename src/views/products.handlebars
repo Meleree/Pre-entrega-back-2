@@ -1,9 +1,37 @@
-<ul class="product-list">
-  {{#each products}}
-    <li>
-      <h2>{{this.title}}</h2>
-      <p>{{this.description}}</p>
-      <a href="/products/{{this._id}}" class="btn">Ver Detalles</a>
-    </li>
-  {{/each}}
-</ul>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <ul class="nav-links">
+      <li><a href="/">Inicio</a></li>
+      <li><a href="/products">Productos</a></li>
+      <li><a href="/cart" class="cart-btn">🛒 Carrito</a></li>
+    </ul>
+  </nav>
+
+  <h1>Productos</h1>
+
+  <div class="dashboard">
+    {{#each products}}
+      <div class="product-card">
+        <div class="product-image-container">
+          <img 
+            src="{{#if this.thumbnail}}{{this.thumbnail}}{{else}}/img/default-placeholder.png{{/if}}" 
+            alt="{{this.title}}" 
+            class="product-image"
+          >
+        </div>
+        <h2 class="product-title">{{this.title}}</h2>
+        <p class="product-price">$ {{this.price}}</p>
+        <a href="/products/{{this._id}}" class="btn">Ver Detalles</a>
+      </div>
+    {{/each}}
+  </div>
+</body>
+</html>

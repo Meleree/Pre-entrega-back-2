@@ -1,49 +1,35 @@
+// src/config/passport.js
 import passport from 'passport';
-import local from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import User from '../models/User.js';
 import dotenv from 'dotenv';
+import User from '../dao/models/user.model.js'; // <-- cambio aquí
+
 dotenv.config();
 
-const LocalStrategy = local.Strategy;
+const JWT_SECRET = process.env.JWT_SECRET;
 
-passport.use(
-  'login',
-  new LocalStrategy(
-    { usernameField: 'email', passwordField: 'password' },
-    async (email, password, done) => {
-      try {
-        const user = await User.findOne({ email });
-        if (!user) return done(null, false, { message: 'Usuario no encontrado' });
+const cookieExtractor = (req) => {
+  let token = null;
+  if (req && req.signedCookies) token = req.signedCookies.currentUser;
+  return token;
+};
 
-        const isValid = user.isValidPassword(password);
-        if (!isValid) return done(null, false, { message: 'Contraseña incorrecta' });
-
-        return done(null, user);
-      } catch (err) {
-        return done(err);
-      }
-    }
-  )
-);
+const options = {
+  jwtFromRequest: cookieExtractor,
+  secretOrKey: JWT_SECRET,
+};
 
 passport.use(
   'jwt',
-  new JwtStrategy(
-    {
-      secretOrKey: process.env.JWT_SECRET,
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => req?.cookies?.jwt || null,
-      ]),
-    },
-    async (payload, done) => {
-      try {
-        return done(null, payload.user); 
-      } catch (err) {
-        return done(err);
-      }
+  new JwtStrategy(options, async (payload, done) => {
+    try {
+      const user = await User.findById(payload.user.id);
+      if (!user) return done(null, false);
+      return done(null, user);
+    } catch (err) {
+      return done(err, false);
     }
-  )
+  })
 );
 
 export default passport;
